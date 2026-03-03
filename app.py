@@ -1,25 +1,28 @@
 import streamlit as st
 from supabase import create_client
+import json
 import random
 import time
 import streamlit.components.v1 as components
 
-# --- 1. BAĞLANTI ---
+# --- 1. SUPABASE BAĞLANTISI ---
 URL = "https://whtawpamszuyemebwuvu.supabase.co"
 KEY = "sb_publishable_pxXYAqzI8mf70h2YHNF1Xg_J7x2vZJU"
 supabase = create_client(URL, KEY)
 
-# --- 2. ŞEHİR HAVUZU (Sonsuz Video İçin Kaynak) ---
-# Buraya ne kadar çok şehir eklersen o kadar devasa bir oyun olur
-SEHIR_HAVUZU = [
-    {"sehir": "Paris", "ulke": "Fransa", "ids": ["5p5FoQR8wTM", "EsFheWkimsU"]}, # Örnek ID'ler
-    {"sehir": "Londra", "ulke": "İngiltere", "ids": ["lh8dNmneVyY", "AQqPG14QjJM"]},
-    # ... Bu liste sadece isim olarak bile kalsa yeterli olacak şekilde geliştirilebilir
-]
+# --- 2. VERİ YÜKLEME ---
+def load_data():
+    try:
+        with open('sehirler.json', 'r', encoding='utf-8') as f:
+            return json.load(f)['oyun_verisi']
+    except:
+        return []
 
-# --- 3. PİTO GÜVENLİ OYNATICI ---
-def pito_video_oynatici(video_id, start_time):
-    embed_url = f"https://www.youtube.com/embed/{video_id}?start={start_time}&autoplay=1&controls=0&rel=0&modestbranding=1"
+sehirler = load_data()
+
+# --- 3. GÜVENLİ VİDEO OYNATICI (KOPYA ENGELLEYİCİ) ---
+def pito_guvenli_video(video_id, start_time):
+    embed_url = f"https://www.youtube.com/embed/{video_id}?start={start_time}&autoplay=1&controls=0&rel=0&modestbranding=1&disablekb=1"
     html_kodu = f"""
     <div style="position: relative; width: 100%; height: 450px; overflow: hidden; border-radius: 15px; border: 3px solid #00FFCC; pointer-events: none;">
         <div style="position: absolute; top: 0; left: 0; width: 100%; height: 60px; background-color: black; z-index: 20;"></div>
@@ -29,78 +32,109 @@ def pito_video_oynatici(video_id, start_time):
     """
     components.html(html_kodu, height=460)
 
-# --- 4. AKILLI ŞIK OLUŞTURUCU ---
-def dinamik_sik_hazirla(dogru_cevap):
-    yanlislar = random.sample([s for s in SEHIR_HAVUZU if f"{s['sehir']}, {s['ulke']}" != dogru_cevap], 3)
-    hepsi = [f"{s['sehir']}, {s['ulke']}" for s in yanlislar] + [dogru_cevap]
-    random.shuffle(hepsi)
-    return hepsi
+# --- 4. ANA YAPI ---
+st.set_page_config(page_title="Pito Maraton", layout="wide")
 
-# --- 5. ANA YAPI ---
-st.set_page_config(page_title="Pito Ultimate Guesser", layout="wide")
-
+# Liderlik Tablosu (Sidebar)
 with st.sidebar:
-    st.header("🏆 Pito Ligi")
-    # Skorbord kodu buraya gelecek...
-    with st.expander("🔐 Yönetim"):
-        is_admin = (st.text_input("Şifre:", type="password") == "pito123")
+    st.header("🏆 Yarışma Kürsüsü")
+    try:
+        skorlar = supabase.table("sehir_tahmin_skor").select("*").order("puan", desc=True).limit(5).execute()
+        for i, s in enumerate(skorlar.data):
+            st.write(f"{i+1}. {s['ogrenci_adi']} - {s['puan']} XP")
+    except: pass
+    
+    st.write("---")
+    with st.expander("🔐 Öğretmen Girişi"):
+        sifre = st.text_input("Şifre:", type="password")
+        admin_modu = (sifre == "pito123")
 
-# --- ÖĞRETMEN PANELİ (Gelişmiş) ---
-if is_admin:
-    st.subheader("🎮 Oyun Kurucu Merkezi")
-    if st.button("🎲 RASTGELE YENİ BÖLÜM OLUŞTUR"):
-        secilen = random.choice(SEHIR_HAVUZU)
-        v_id = random.choice(secilen['ids'])
-        v_start = random.randint(180, 600) # Her seferinde farklı bir saniyeden başlar!
-        
-        supabase.table("oyun_odasi").update({
-            "aktif_sehir_id": v_id, # Artık ID yerine direkt video ID saklıyoruz
-            "durum": "aktif",
-            "ek_bilgi": f"{secilen['sehir']}, {secilen['ulke']}", # Cevabı buraya sakladık
-            "bitis_zamani": v_start
-        }).eq("id", 1).execute()
-        st.success(f"Yeni Tur: {secilen['sehir']} Yayında!")
+# --- 5. ÖĞRETMEN PANELİ ---
+if admin_modu:
+    st.subheader("👨‍🏫 Oyun Kurucu Paneli")
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        if st.button("🔴 OYUNU BAŞLAT / YENİ ŞEHİR", use_container_width=True):
+            yeni = random.choice(sehirler)
+            # Veritabanını 'aktif' yap ve yeni şehri ata
+            supabase.table("oyun_odasi").update({
+                "aktif_sehir_id": yeni['id'],
+                "durum": "aktif"
+            }).eq("id", 1).execute()
+            st.success("Oyun başlatıldı! Öğrenciler şu an videoyu görüyor.")
 
-# --- ÖĞRENCİ PANELİ ---
+    with col2:
+        if st.button("⚪ LOBİYE DÖN (DURDUR)", use_container_width=True):
+            # Durumu bekleme yap
+            supabase.table("oyun_odasi").update({
+                "durum": "bekleme",
+                "aktif_sehir_id": None
+            }).eq("id", 1).execute()
+            st.warning("Oyun durduruldu, öğrenciler lobiye alındı.")
+
+# --- 6. ÖĞRENCİ PANELİ ---
 else:
     if 'ogrenci_ismi' not in st.session_state:
-        st.session_state.ogrenci_ismi = st.text_input("Yarışmacı Adı:")
+        st.session_state.ogrenci_ismi = st.text_input("Yarışmacı Adın:", placeholder="İsmini yaz ve bekle...")
         st.stop()
 
-    oda = supabase.table("oyun_odasi").select("*").eq("id", 1).execute().data[0]
-    
+    # SÜREKLİ KONTROL: Veritabanı durumunu oku
+    res = supabase.table("oyun_odasi").select("*").eq("id", 1).execute()
+    oda = res.data[0]
+
+    # KONTROL: Eğer öğretmen henüz 'aktif' yapmadıysa
     if oda['durum'] != "aktif":
-        st.info("👋 Hoş geldin! Öğretmeninin maratonu başlatmasını bekliyoruz...")
-        st.stop()
+        st.title(f"👋 Selam {st.session_state.ogrenci_ismi}!")
+        st.markdown("## ⏳ Bekleme Odasındasın")
+        st.info("Pito: 'Diğer arkadaşların da gelmesini bekliyoruz. Öğretmen oyunu başlattığında maraton otomatik açılacak!'")
+        
+        # Kahoot gibi isimleri ekranda döndürebiliriz ama şimdilik manuel yenileme:
+        if st.button("Sıradaki Tur Başladı mı? Kontrol Et 🔄"):
+            st.rerun()
+        st.stop() # BURADAN AŞAĞIYA GEÇİŞ YOK!
 
-    # Tur Değişimi Kontrolü
-    if 'tur_id' not in st.session_state or st.session_state.tur_id != oda['aktif_sehir_id']:
-        st.session_state.tur_id = oda['aktif_sehir_id']
+    # --- BURASI SADECE ÖĞRETMEN BAŞLATINCA ÇALIŞIR ---
+    if 'su_anki_tur' not in st.session_state or st.session_state.su_anki_tur != oda['aktif_sehir_id']:
+        st.session_state.su_anki_tur = oda['aktif_sehir_id']
         st.session_state.cevap_verildi = False
-        st.session_state.siklar = dinamik_sik_hazirla(oda['ek_bilgi'])
-        st.session_state.baslama_t = time.time()
+        hedef = next(s for s in sehirler if s['id'] == oda['aktif_sehir_id'])
+        
+        # Şıklar her öğrenci için farklı sırada oluşsun
+        dogru_metin = f"{hedef['sehir']}, {hedef['ulke']}"
+        yanlislar = random.sample([f"{s['sehir']}, {s['ulke']}" for s in sehirler if s['sehir'] != hedef['sehir']], 3)
+        st.session_state.siklar = yanlislar + [dogru_metin]
+        random.shuffle(st.session_state.siklar)
+        st.session_state.zaman_basla = time.time()
 
     if not st.session_state.cevap_verildi:
-        pito_video_oynatici(oda['aktif_sehir_id'], oda['bitis_zamani'])
+        hedef = next(s for s in sehirler if s['id'] == oda['aktif_sehir_id'])
+        st.subheader(f"📍 Dedektif {st.session_state.ogrenci_ismi}, Burası Neresi?")
+        pito_guvenli_video(hedef['video_id'], hedef['baslangic_sn'])
         
         st.write("---")
-        secilen_cevap = None
         c1, c2 = st.columns(2)
+        secim = None
         with c1:
-            if st.button(st.session_state.siklar[0], use_container_width=True): secilen_cevap = st.session_state.siklar[0]
-            if st.button(st.session_state.siklar[1], use_container_width=True): secilen_cevap = st.session_state.siklar[1]
+            if st.button(st.session_state.siklar[0], use_container_width=True, key="x1"): secim = st.session_state.siklar[0]
+            if st.button(st.session_state.siklar[1], use_container_width=True, key="x2"): secim = st.session_state.siklar[1]
         with c2:
-            if st.button(st.session_state.siklar[2], use_container_width=True): secilen_cevap = st.session_state.siklar[2]
-            if st.button(st.session_state.siklar[3], use_container_width=True): secilen_cevap = st.session_state.siklar[3]
+            if st.button(st.session_state.siklar[2], use_container_width=True, key="x3"): secim = st.session_state.siklar[2]
+            if st.button(st.session_state.siklar[3], use_container_width=True, key="x4"): secim = st.session_state.siklar[3]
 
-        if secilen_cevap:
-            if secilen_cevap == oda['ek_bilgi']:
-                gecen = time.time() - st.session_state.baslama_t
-                bonus = max(0, int(25 - gecen))
+        if secim:
+            dogru_cevap = f"{hedef['sehir']}, {hedef['ulke']}"
+            if secim == dogru_cevap:
+                gecen = time.time() - st.session_state.zaman_basla
+                bonus = max(0, int(20 - gecen))
+                toplam = 20 + bonus
                 st.balloons()
-                st.success(f"✅ BİLDİN! +{20 + bonus} XP")
-                supabase.rpc('artir_sehir_puani', {'ad': st.session_state.ogrenci_ismi, 'ek_puan': 20 + bonus}).execute()
+                st.success(f"✅ BİLDİN! {toplam} XP (Hız Bonusu: {bonus})")
+                supabase.rpc('artir_sehir_puani', {'ad': st.session_state.ogrenci_ismi, 'ek_puan': toplam}).execute()
             else:
-                st.error(f"❌ YANLIŞ! Doğru cevap: {oda['ek_bilgi']}")
+                st.error(f"❌ YANLIŞ! Doğru cevap: {dogru_cevap}")
             st.session_state.cevap_verildi = True
             st.rerun()
+    else:
+        st.info("🎯 Cevabını verdin. Öğretmenin yeni şehri seçmesini bekliyoruz...")
+        if st.button("Yeni Şehir Geldi mi? 🔄"): st.rerun()
