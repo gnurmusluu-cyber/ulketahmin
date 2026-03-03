@@ -3,7 +3,7 @@ from supabase import create_client
 import json
 import random
 import time
-
+import streamlit.components.v1 as components
 # --- 1. SUPABASE BAĞLANTISI ---
 # Kendi Pito Python Akademi proje bilgilerini buraya gir
 URL = "https://whtawpamszuyemebwuvu.supabase.co"
