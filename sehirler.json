@@ -1,183 +1,24 @@
+{
   "oyun_verisi": [
-    {
-      "id": 1,
-      "sehir": "Roma",
-      "ulke": "İtalya",
-      "video_id": "EsFheWkimsU",
-      "baslangic_sn": 485,
-      "zorluk": "Kolay",
-      "ipucu": "Antik mimari ve sarımtırak binalar."
-    },
-    {
-      "id": 2,
-      "sehir": "Vancouver",
-      "ulke": "Kanada",
-      "video_id": "lh8dNmneVyY",
-      "baslangic_sn": 1200,
-      "zorluk": "Orta",
-      "ipucu": "Modern gökdelenler ve geniş caddeler."
-    },
-    {
-      "id": 3,
-      "sehir": "Kopenhag",
-      "ulke": "Danimarka",
-      "video_id": "AQqPG14QjJM",
-      "baslangic_sn": 900,
-      "zorluk": "Kolay",
-      "ipucu": "Çok sayıda bisikletli ve kuzey Avrupa mimarisi."
-    },
-    {
-      "id": 4,
-      "sehir": "Kharkiv",
-      "ulke": "Ukrayna",
-      "video_id": "REi-DzeblLQ",
-      "baslangic_sn": 1500,
-      "zorluk": "Zor",
-      "ipucu": "Kiril alfabesi içeren tabelalara dikkat!"
-    },
-    {
-      "id": 5,
-      "sehir": "New York",
-      "ulke": "ABD",
-      "video_id": "PEhKhACVfaA",
-      "baslangic_sn": 600,
-      "zorluk": "Kolay",
-      "ipucu": "Sarı taksiler ve dikey mimari."
-    },
-    {
-      "id": 6,
-      "sehir": "Ubud",
-      "ulke": "Endonezya",
-      "video_id": "5p5FoQR8wTM",
-      "baslangic_sn": 2100,
-      "zorluk": "Orta",
-      "ipucu": "Tropikal bitkiler ve dar sokaklar."
-    },
-    {
-      "id": 7,
-      "sehir": "Portland",
-      "ulke": "ABD",
-      "video_id": "WluMkc3OtoM",
-      "baslangic_sn": 3200,
-      "zorluk": "Zor",
-      "ipucu": "Bolca ağaçlı cadde ve tramvay hatları."
-    }
-    {
-      "id": 8,
-      "sehir": "Tokyo",
-      "ulke": "Japonya",
-      "video_id": "Xp7S_CstMog",
-      "baslangic_sn": 600,
-      "zorluk": "Kolay",
-      "ipucu": "Neon tabelalar ve soldan akan trafik."
-    },
-    {
-      "id": 9,
-      "sehir": "Lizbon",
-      "ulke": "Portekiz",
-      "video_id": "mE_I7-P73xU",
-      "baslangic_sn": 1500,
-      "zorluk": "Orta",
-      "ipucu": "Sarı nostaljik tramvaylar ve dik yokuşlar."
-    },
-    {
-      "id": 10,
-      "sehir": "Amsterdam",
-      "ulke": "Hollanda",
-      "video_id": "M7X9_Hl60Kk",
-      "baslangic_sn": 300,
-      "zorluk": "Kolay",
-      "ipucu": "Kanallar ve bitişik dar evler."
-    },
-    {
-      "id": 11,
-      "sehir": "Prag",
-      "ulke": "Çekya",
-      "video_id": "Kq09h6IisL0",
-      "baslangic_sn": 2100,
-      "zorluk": "Orta",
-      "ipucu": "Gotik kuleler ve taş döşeli sokaklar."
-    },
-    {
-      "id": 12,
-      "sehir": "Singapur",
-      "ulke": "Singapur",
-      "video_id": "iAfNEX_jKII",
-      "baslangic_sn": 0,
-      "zorluk": "Kolay",
-      "ipucu": "Ultra modern binalar ve aşırı temiz caddeler."
-    },
-    {
-      "id": 13,
-      "sehir": "Seul",
-      "ulke": "Güney Kore",
-      "video_id": "nN_n2B97zK8",
-      "baslangic_sn": 1200,
-      "zorluk": "Zor",
-      "ipucu": "Modern teknoloji binaları ve Hangıl alfabesi."
-    },
-    {
-      "id": 14,
-      "sehir": "Zürih",
-      "ulke": "İsviçre",
-      "video_id": "2ITZkB4_AwU",
-      "baslangic_sn": 0,
-      "zorluk": "Orta",
-      "ipucu": "Göl kenarı, lüks saat dükkanları ve düzen."
-    },
-    {
-      "id": 15,
-      "sehir": "Barselona",
-      "ulke": "İspanya",
-      "video_id": "Y8S98GqR0bE",
-      "baslangic_sn": 3500,
-      "zorluk": "Orta",
-      "ipucu": "Gaudi esintili balkonlar ve geniş meydanlar."
-    },
-    {
-      "id": 16,
-      "sehir": "Floransa",
-      "ulke": "İtalya",
-      "video_id": "e76mrmE06bA",
-      "baslangic_sn": 42,
-      "zorluk": "Zor",
-      "ipucu": "Rönesans heykelleri ve kahverengi kiremitli çatılar."
-    },
-    {
-      "id": 17,
-      "sehir": "Münih",
-      "ulke": "Almanya",
-      "video_id": "UdUCJ-_AgEc",
-      "baslangic_sn": 0,
-      "zorluk": "Orta",
-      "ipucu": "Mavi-beyaz tramvaylar ve düzenli caddeler."
-    },
-    {
-      "id": 18,
-      "sehir": "Toronto",
-      "ulke": "Kanada",
-      "video_id": "5iugPhaQOhQ",
-      "baslangic_sn": 0,
-      "zorluk": "Orta",
-      "ipucu": "CN Kulesi benzeri yapılar ve Kuzey Amerika stili."
-    },
-    {
-      "id": 19,
-      "sehir": "Dubai",
-      "ulke": "BAE",
-      "video_id": "LGgQX2ltz3o",
-      "baslangic_sn": 0,
-      "zorluk": "Kolay",
-      "ipucu": "Çöl güneşi, devasa alışveriş merkezleri ve gökdelenler."
-    },
-    {
-      "id": 20,
-      "sehir": "Bali (Ubud)",
-      "ulke": "Endonezya",
-      "video_id": "5p5FoQR8wTM",
-      "baslangic_sn": 5400,
-      "zorluk": "Zor",
-      "ipucu": "Tapınak girişleri ve motosiklet yoğunluğu."
-    }
+    { "id": 1, "sehir": "Roma", "ulke": "İtalya", "video_id": "EsFheWkimsU", "baslangic_sn": 485, "zorluk": "Kolay", "ipucu": "Antik mimari ve sarımtırak binalar." },
+    { "id": 2, "sehir": "Vancouver", "ulke": "Kanada", "video_id": "lh8dNmneVyY", "baslangic_sn": 1200, "zorluk": "Orta", "ipucu": "Modern gökdelenler ve geniş caddeler." },
+    { "id": 3, "sehir": "Kopenhag", "ulke": "Danimarka", "video_id": "AQqPG14QjJM", "baslangic_sn": 900, "zorluk": "Kolay", "ipucu": "Çok sayıda bisikletli ve kuzey Avrupa mimarisi." },
+    { "id": 4, "sehir": "Kharkiv", "ulke": "Ukrayna", "video_id": "REi-DzeblLQ", "baslangic_sn": 1500, "zorluk": "Zor", "ipucu": "Kiril alfabesi içeren tabelalara dikkat!" },
+    { "id": 5, "sehir": "New York", "ulke": "ABD", "video_id": "PEhKhACVfaA", "baslangic_sn": 600, "zorluk": "Kolay", "ipucu": "Sarı taksiler ve dikey mimari." },
+    { "id": 6, "sehir": "Ubud", "ulke": "Endonezya", "video_id": "5p5FoQR8wTM", "baslangic_sn": 2100, "zorluk": "Orta", "ipucu": "Tropikal bitkiler ve dar sokaklar." },
+    { "id": 7, "sehir": "Portland", "ulke": "ABD", "video_id": "WluMkc3OtoM", "baslangic_sn": 3200, "zorluk": "Zor", "ipucu": "Bolca ağaçlı cadde ve tramvay hatları." },
+    { "id": 8, "sehir": "Tokyo", "ulke": "Japonya", "video_id": "Xp7S_CstMog", "baslangic_sn": 600, "zorluk": "Kolay", "ipucu": "Neon tabelalar ve soldan akan trafik." },
+    { "id": 9, "sehir": "Lizbon", "ulke": "Portekiz", "video_id": "mE_I7-P73xU", "baslangic_sn": 1500, "zorluk": "Orta", "ipucu": "Sarı nostaljik tramvaylar ve dik yokuşlar." },
+    { "id": 10, "sehir": "Amsterdam", "ulke": "Hollanda", "video_id": "M7X9_Hl60Kk", "baslangic_sn": 300, "zorluk": "Kolay", "ipucu": "Kanallar ve bitişik dar evler." },
+    { "id": 11, "sehir": "Prag", "ulke": "Çekya", "video_id": "Kq09h6IisL0", "baslangic_sn": 2100, "zorluk": "Orta", "ipucu": "Gotik kuleler ve taş döşeli sokaklar." },
+    { "id": 12, "sehir": "Singapur", "ulke": "Singapur", "video_id": "iAfNEX_jKII", "baslangic_sn": 0, "zorluk": "Kolay", "ipucu": "Ultra modern binalar ve aşırı temiz caddeler." },
+    { "id": 13, "sehir": "Seul", "ulke": "Güney Kore", "video_id": "nN_n2B97zK8", "baslangic_sn": 1200, "zorluk": "Zor", "ipucu": "Modern teknoloji binaları ve Hangıl alfabesi." },
+    { "id": 14, "sehir": "Zürih", "ulke": "İsviçre", "video_id": "2ITZkB4_AwU", "baslangic_sn": 0, "zorluk": "Orta", "ipucu": "Göl kenarı, lüks saat dükkanları ve düzen." },
+    { "id": 15, "sehir": "Barselona", "ulke": "İspanya", "video_id": "Y8S98GqR0bE", "baslangic_sn": 3500, "zorluk": "Orta", "ipucu": "Gaudi esintili balkonlar ve geniş meydanlar." },
+    { "id": 16, "sehir": "Floransa", "ulke": "İtalya", "video_id": "e76mrmE06bA", "baslangic_sn": 42, "zorluk": "Zor", "ipucu": "Rönesans heykelleri ve kahverengi kiremitli çatılar." },
+    { "id": 17, "sehir": "Münih", "ulke": "Almanya", "video_id": "UdUCJ-_AgEc", "baslangic_sn": 0, "zorluk": "Orta", "ipucu": "Mavi-beyaz tramvaylar ve düzenli caddeler." },
+    { "id": 18, "sehir": "Toronto", "ulke": "Kanada", "video_id": "5iugPhaQOhQ", "baslangic_sn": 0, "zorluk": "Orta", "ipucu": "CN Kulesi benzeri yapılar ve Kuzey Amerika stili." },
+    { "id": 19, "sehir": "Dubai", "ulke": "BAE", "video_id": "LGgQX2bs3o", "baslangic_sn": 0, "zorluk": "Kolay", "ipucu": "Çöl güneşi, devasa alışveriş merkezleri ve gökdelenler." },
+    { "id": 20, "sehir": "Bali", "ulke": "Endonezya", "video_id": "5p5FoQR8wTM", "baslangic_sn": 5400, "zorluk": "Zor", "ipucu": "Tapınak girişleri ve motosiklet yoğunluğu." }
   ]
 }
