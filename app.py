@@ -44,99 +44,100 @@ st.set_page_config(page_title="Pito CityGuesser", layout="wide")
 
 # Liderlik Tablosu (Sidebar)
 with st.sidebar:
-    st.header("🏆 Skorbord")
+    st.header("🏆 Canlı Skorlar")
     try:
-        skorlar = supabase.table("sehir_tahmin_skor").select("*").order("puan", desc=True).limit(5).execute()
+        skorlar = supabase.table("sehir_tahmin_skor").select("*").order("puan", desc=True).limit(8).execute()
         for i, s in enumerate(skorlar.data):
-            st.write(f"**{i+1}. {s['ogrenci_adi']}** — `{s['puan']} XP`")
-    except: st.write("Veri bekleniyor...")
+            st.markdown(f"**{i+1}. {s['ogrenci_adi']}** — `{s['puan']} XP`")
+    except: st.write("Yükleniyor...")
     
     st.write("---")
-    # GİZLİ ÖĞRETMEN GİRİŞİ
-    with st.expander("🔐 Yönetim"):
-        sifre = st.text_input("Öğretmen Şifresi:", type="password")
-        if sifre == "pito123": # Buradan şifreyi değiştirebilirsin
-            st.session_state.is_admin = True
-            st.success("Yönetici Erişimi Aktif!")
+    # GİZLİ YÖNETİM PANELİ GİRİŞİ
+    with st.expander("🔐 Öğretmen Paneli"):
+        sifre = st.text_input("Şifre Girin:", type="password")
+        if sifre == "pito123":
+            st.session_state.admin_onay = True
+            st.success("Erişim Sağlandı!")
         else:
-            st.session_state.is_admin = False
+            st.session_state.admin_onay = False
 
-# --- ÖĞRETMEN KONTROLÜ (ŞİFRELİ) ---
-if st.session_state.get('is_admin'):
+# --- ÖĞRETMEN PANELİ ---
+if st.session_state.get('admin_onay'):
     st.subheader("👨‍🏫 Maraton Kontrol Merkezi")
+    col1, col2 = st.columns(2)
     
-    col_a, col_b = st.columns(2)
-    with col_a:
-        if st.button("🚀 OYUNU BAŞLAT / SIRADAKİ ŞEHİR"):
+    with col1:
+        if st.button("🚀 SIRADAKİ ŞEHİR / OYUNU BAŞLAT"):
             yeni = random.choice(sehirler)
             supabase.table("oyun_odasi").update({
                 "aktif_sehir_id": yeni['id'],
-                "durum": "aktif",
-                "bitis_zamani": time.time()
+                "durum": "aktif"
             }).eq("id", 1).execute()
-            st.balloons()
-            st.success("Yeni şehir sınıfa gönderildi!")
-            
-    with col_b:
-        if st.button("🛑 OYUNU DURDUR / BEKLEME MODU"):
-            supabase.table("oyun_odasi").update({"durum": "beklemede", "aktif_sehir_id": None}).eq("id", 1).execute()
-            st.warning("Oyun durduruldu, öğrenciler bekleme salonuna alındı.")
+            st.success("Yeni görev gönderildi!")
+
+    with col2:
+        if st.button("🛑 OYUNU DURDUR (BEKLEME MODU)"):
+            supabase.table("oyun_odasi").update({
+                "durum": "bekleme",
+                "aktif_sehir_id": None
+            }).eq("id", 1).execute()
+            st.warning("Oyun tüm öğrenciler için durduruldu.")
 
 # --- ÖĞRENCİ PANELİ ---
 else:
     if 'ogrenci_ismi' not in st.session_state:
-        st.session_state.ogrenci_ismi = st.text_input("Yarışmacı Adı:")
-        st.info("Pito: 'İsmini yaz ve öğretmeninin oyunu başlatmasını bekle!'")
+        st.session_state.ogrenci_ismi = st.text_input("Yarışmacı Adın:", placeholder="İsmini yaz ve Enter'la...")
         st.stop()
 
-    # Oda verisini çek
+    # Supabase'den durum kontrolü
     oda = supabase.table("oyun_odasi").select("*").eq("id", 1).execute().data[0]
     
-    if oda['durum'] == "beklemede":
-        st.title(f"👋 Selam {st.session_state.ogrenci_ismi}!")
-        st.info("🎮 Oyun Henüz Başlamadı. Pito: 'Öğretmenin butona bastığında macera başlayacak!'")
-        if st.button("Yenile"): st.rerun()
-    
-    else:
-        # Yeni tur kontrolü
-        if 'mevcut_id' not in st.session_state or st.session_state.mevcut_id != oda['aktif_sehir_id']:
-            st.session_state.mevcut_id = oda['aktif_sehir_id']
-            st.session_state.cevap_verildi = False
-            if oda['aktif_sehir_id']:
-                hedef = next(s for s in sehirler if s['id'] == oda['aktif_sehir_id'])
-                st.session_state.siklar = siklari_hazirla(hedef)
-                st.session_state.baslangic_anlik = time.time()
+    # EĞER DURUM BEKLEMEDE İSE VİDEOYU GÖSTERME, BURADA DUR!
+    if oda['durum'] != "aktif":
+        st.title(f"👋 Hoş Geldin {st.session_state.ogrenci_ismi}!")
+        st.info("🎮 Pito: 'Şu an bekleme salonundayız. Öğretmenin maratonu başlattığında burada video belirecek. Sayfayı kapatma!'")
+        if st.button("Yenile 🔄"):
+            st.rerun()
+        st.stop() # KRİTİK: Kodun geri kalanını çalıştırmaz!
 
-        if oda['aktif_sehir_id'] and not st.session_state.cevap_verildi:
-            hedef = next(s for s in sehirler if s['id'] == oda['aktif_sehir_id'])
-            st.subheader(f"📍 Dedektif {st.session_state.ogrenci_ismi}, Neredesin?")
-            pito_guvenli_video(hedef['video_id'], hedef['baslangic_sn'])
+    # --- BURADAN SONRASI SADECE DURUM 'AKTİF' İSE ÇALIŞIR ---
+    if 'su_anki_id' not in st.session_state or st.session_state.su_anki_id != oda['aktif_sehir_id']:
+        st.session_state.su_anki_id = oda['aktif_sehir_id']
+        st.session_state.cevap_verildi = False
+        hedef = next(s for s in sehirler if s['id'] == oda['aktif_sehir_id'])
+        st.session_state.siklar = siklari_hazirla(hedef)
+        st.session_state.zaman_basla = time.time()
+
+    if not st.session_state.cevap_verildi:
+        hedef = next(s for s in sehirler if s['id'] == oda['aktif_sehir_id'])
+        st.subheader(f"📍 Dedektif {st.session_state.ogrenci_ismi}, Burası Neresi?")
+        
+        pito_guvenli_video(hedef['video_id'], hedef['baslangic_sn'])
+        
+        st.write("---")
+        col_x, col_y = st.columns(2)
+        secilen = None
+        with col_x:
+            if st.button(st.session_state.siklar[0], use_container_width=True, key="s1"): secilen = st.session_state.siklar[0]
+            if st.button(st.session_state.siklar[1], use_container_width=True, key="s2"): secilen = st.session_state.siklar[1]
+        with col_y:
+            if st.button(st.session_state.siklar[2], use_container_width=True, key="s3"): secilen = st.session_state.siklar[2]
+            if st.button(st.session_state.siklar[3], use_container_width=True, key="s4"): secilen = st.session_state.siklar[3]
+
+        if secilen:
+            dogru_cevap = f"{hedef['sehir']}, {hedef['ulke']}"
+            if secilen == dogru_cevap:
+                sure = time.time() - st.session_state.zaman_basla
+                hiz_bonusu = max(0, int(20 - sure))
+                toplam = 20 + hiz_bonusu
+                st.balloons()
+                st.success(f"✅ HARİKA! {toplam} XP! (Hız Bonusu: +{hiz_bonusu})")
+                supabase.rpc('artir_sehir_puani', {'ad': st.session_state.ogrenci_ismi, 'ek_puan': toplam}).execute()
+            else:
+                st.error(f"❌ Üzgünüm! Doğru cevap: {dogru_cevap}")
             
-            st.write("---")
-            col1, col2 = st.columns(2)
-            secim = None
-            with col1:
-                if st.button(st.session_state.siklar[0], use_container_width=True, key="c1"): secim = st.session_state.siklar[0]
-                if st.button(st.session_state.siklar[1], use_container_width=True, key="c2"): secim = st.session_state.siklar[1]
-            with col2:
-                if st.button(st.session_state.siklar[2], use_container_width=True, key="c3"): secim = st.session_state.siklar[2]
-                if st.button(st.session_state.siklar[3], use_container_width=True, key="c4"): secim = st.session_state.siklar[3]
-
-            if secim:
-                dogru_cevap = f"{hedef['sehir']}, {hedef['ulke']}"
-                if secim == dogru_cevap:
-                    gecen_sure = time.time() - st.session_state.baslangic_anlik
-                    zaman_bonusu = max(0, int(20 - gecen_sure))
-                    toplam_puan = 20 + zaman_bonusu
-                    st.balloons()
-                    st.success(f"✅ BİLDİN! {toplam_puan} XP Kazandın! (Hız: {int(gecen_sure)}sn)")
-                    supabase.rpc('artir_sehir_puani', {'ad': st.session_state.ogrenci_ismi, 'ek_puan': toplam_puan}).execute()
-                else:
-                    st.error(f"❌ YANLIŞ! Doğru cevap: {dogru_cevap}")
-                
-                st.session_state.cevap_verildi = True
-                st.rerun()
-
-        elif st.session_state.cevap_verildi:
-            st.info("🎯 Cevabın kaydedildi. Yeni turun gelmesini bekliyorsun...")
-            if st.button("Yeni Tur Geldi mi?"): st.rerun()
+            st.session_state.cevap_verildi = True
+            st.rerun()
+    else:
+        st.info("🎯 Cevabını verdin. Pito: 'Şimdi arkana yaslan ve diğerlerini izle ya da yeni turu bekle!'")
+        if st.button("Yeni Görev Geldi mi? 🔄"): st.rerun()
